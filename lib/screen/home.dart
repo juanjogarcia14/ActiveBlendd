@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:activeblendd/screen/alimentacionscreen.dart';
 import 'package:activeblendd/screen/materialscreen.dart';
-import 'package:activeblendd/screen/ropadeportivascreen.dart';
+import 'package:activeblendd/screen/ropa_deportiva_screen.dart';
 
 void main() {
   runApp(MyApp());
