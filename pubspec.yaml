@@ -38,3 +38,7 @@ flutter:
     - lib/assets/pantalon.png
     - lib/assets/sudadera.png
     - lib/assets/zapatillas.png
+    - lib/assets/mancuerna.png
+    - lib/assets/proteina.png
+    - lib/assets/alimentacion.png
+    - lib/assets/material.png
