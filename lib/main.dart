@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFF00796B), // Color principal
         scaffoldBackgroundColor: Color(0xFFACE0D4), // Fondo del login
       ),
-      initialRoute: '/home', // Ruta inicial
+      initialRoute: '/ropaDeportiva', // Ruta inicial
       routes: {
         '/home': (context) => HomeScreen(),
         '/alimentacion': (context) => AlimentacionScreen(),
