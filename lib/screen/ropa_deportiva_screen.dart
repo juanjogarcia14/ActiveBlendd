@@ -153,8 +153,8 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
               leading: Icon(Icons.home),
               title: Text('Home'),
               onTap: () {
-                Navigator.pop(context);
-                navigateTo('/home');
+                Navigator.pop(context); // Cierra el Drawer
+                Navigator.pushReplacementNamed(context, '/home');
               },
             ),
             ListTile(
@@ -162,7 +162,7 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
               title: Text('Alimentación'),
               onTap: () {
                 Navigator.pop(context);
-                navigateTo('/alimentacion');
+                Navigator.pushReplacementNamed(context, '/alimentacion');
               },
             ),
             ListTile(
@@ -170,7 +170,7 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
               title: Text('Material'),
               onTap: () {
                 Navigator.pop(context);
-                navigateTo('/material');
+                Navigator.pushReplacementNamed(context, '/material');
               },
             ),
             ListTile(
@@ -178,7 +178,7 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
               title: Text('Ropa Deportiva'),
               onTap: () {
                 Navigator.pop(context);
-                navigateTo('/ropaDeportiva');
+                Navigator.pushReplacementNamed(context, '/ropaDeportiva');
               },
             ),
             ListTile(
@@ -186,7 +186,7 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
               title: Text('Sobre Nosotros'),
               onTap: () {
                 Navigator.pop(context);
-                navigateTo('/sobreNosotros');
+                Navigator.pushReplacementNamed(context, '/sobreNosotros');
               },
             ),
           ],
