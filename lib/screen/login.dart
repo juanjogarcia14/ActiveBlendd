@@ -17,7 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Logo en la parte superior
-              Image.asset('assets/logo.png', height: 120, errorBuilder: (context, error, stackTrace) {
+              Image.asset('lib/assets/logo.png', height: 120, errorBuilder: (context, error, stackTrace) {
                 return Text('Error al cargar logo.png');
               }),
               SizedBox(height: 20),
@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // Logo de Google para futuro inicio de sesión con Firebase
               GestureDetector(
                 onTap: () {},
-                child: Image.asset('assets/google_logo.png', height: 50, errorBuilder: (context, error, stackTrace) {
+                child: Image.asset('lib/assets/google_logo.png', height: 50, errorBuilder: (context, error, stackTrace) {
                   return Text('Error al cargar google_logo.png');
                 }),
               ),
