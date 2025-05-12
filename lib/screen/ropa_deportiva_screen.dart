@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'favoritos_screen.dart';
 import 'product_provider.dart';
@@ -158,6 +159,16 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
               onTap: () {
                 Navigator.pop(context);
                 navigateTo('/sobreNosotros');
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Cerrar sesión'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],

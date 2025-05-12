@@ -1,5 +1,7 @@
 import 'package:activeblendd/screen/product_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:activeblendd/screen/alimentacionscreen.dart';
 import 'package:activeblendd/screen/materialscreen.dart';
 import 'package:activeblendd/screen/ropa_deportiva_screen.dart';
@@ -162,6 +164,16 @@ class homeState extends State<home> {
               onTap: () {
                 Navigator.pop(context);
                 navigateTo('/sobreNosotros');
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Cerrar sesión'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -111,7 +112,9 @@ class _AlimentacionScreenState extends State<AlimentacionScreen> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFFA8E6DB)),
+              decoration: BoxDecoration(
+                color: Color(0xFFA8E6DB),
+              ),
               child: Text(
                 'Menú',
                 style: TextStyle(
@@ -158,6 +161,16 @@ class _AlimentacionScreenState extends State<AlimentacionScreen> {
               onTap: () {
                 Navigator.pop(context);
                 navigateTo('/sobreNosotros');
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Cerrar sesión'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],
