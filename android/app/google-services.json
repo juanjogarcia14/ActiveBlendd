@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "21870908572",
+    "project_id": "activeblendd-master-2",
+    "storage_bucket": "activeblendd-master-2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:21870908572:android:c59bdd927ee51fca8dc959",
+        "android_client_info": {
+          "package_name": "com.example.activeblendd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBn_jNy9RNIEkq64XxzfciAaTd3uT3hl-8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
