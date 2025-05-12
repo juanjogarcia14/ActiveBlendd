@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
 
-      Navigator.pushReplacementNamed(context, '/ropaDeportiva');
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       setState(() {
         error = e.toString();

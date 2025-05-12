@@ -229,6 +229,7 @@ class _AlimentacionScreenState extends State<AlimentacionScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -244,7 +245,11 @@ class _AlimentacionScreenState extends State<AlimentacionScreen> {
           ),
         ],
         onTap: (index) {
-          if (index == 2) {
+          if (index == 0) {
+            Navigator.pushNamed(context, '/home');
+          } else if (index == 1) {
+            // Ya estás en esta pantalla
+          } else if (index == 2) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => FavoritosScreen()),
