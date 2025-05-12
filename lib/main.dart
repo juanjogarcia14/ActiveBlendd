@@ -1,8 +1,7 @@
-import 'package:activeblendd/screen/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'screen/product_provider.dart';
+import 'package:activeblendd/screen/product_provider.dart';
 import 'screen/login.dart';
 import 'screen/ropa_deportiva_screen.dart';
 import 'screen/alimentacionscreen.dart';
@@ -10,6 +9,9 @@ import 'screen/home.dart';
 import 'screen/materialscreen.dart';
 import 'screen/sobre_nosotros_screen.dart';
 import 'screen/carrito_screen.dart';
+
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/login',
       routes: {
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => home(),
         '/alimentacion': (context) => AlimentacionScreen(),
         '/material': (context) => MaterialScreen(),
         '/ropaDeportiva': (context) => RopaDeportivaScreen(),

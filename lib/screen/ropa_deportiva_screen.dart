@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'favoritos_screen.dart';
 import 'product_provider.dart';
 import 'carrito_screen.dart';
+import 'home.dart';
 
 class RopaDeportivaScreen extends StatefulWidget {
   @override
@@ -21,7 +22,7 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
 
   Future<void> cargarProductos() async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('Ropa') // ← Aquí apunta directamente a la colección 'Ropa'
+        .collection('Ropa')
         .get();
 
     final datos = snapshot.docs.map((doc) {
@@ -38,7 +39,6 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
       products = datos;
     });
   }
-
 
   void navigateTo(String routeName) {
     Navigator.pushNamed(context, routeName);
@@ -181,22 +181,28 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
               itemCount: products.length,
               itemBuilder: (context, index) {
                 final product = products[index];
-                final isFav = provider.favorites.any((item) => item['title'] == product['title']);
+                final isFav = provider.favorites.any(
+                        (item) => item['title'] == product['title']);
                 return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: ListTile(
                     leading: Image.network(
                       product['imageUrl'],
                       height: 80,
                       width: 80,
-                      errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
+                      errorBuilder: (context, error, stackTrace) =>
+                          Icon(Icons.broken_image),
                     ),
-                    title: Text(product['title'], style: TextStyle(fontWeight: FontWeight.bold)),
+                    title: Text(product['title'],
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(product['description']),
-                        Text('${product['price']}€', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('${product['price']}€',
+                            style:
+                            TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     trailing: Row(
@@ -204,10 +210,13 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
                       children: [
                         IconButton(
                           icon: Icon(
-                            isFav ? Icons.favorite : Icons.favorite_border,
+                            isFav
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             color: Colors.red,
                           ),
-                          onPressed: () => provider.toggleFavorite(product),
+                          onPressed: () =>
+                              provider.toggleFavorite(product),
                         ),
                         IconButton(
                           icon: Icon(Icons.add_shopping_cart),
@@ -223,6 +232,7 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -238,7 +248,11 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
           ),
         ],
         onTap: (index) {
-          if (index == 2) {
+          if (index == 0) {
+            Navigator.pushNamed(context, '/home');
+          } else if (index == 1) {
+            // Ya estás en esta pantalla
+          } else if (index == 2) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => FavoritosScreen()),
