@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'carrito_screen.dart';
 import 'favoritos_screen.dart';
 
-
 class home extends StatefulWidget {
   @override
   homeState createState() => homeState();
@@ -23,9 +22,10 @@ class homeState extends State<home> {
     super.initState();
     cargarProductos();
   }
+
   Future<void> cargarProductos() async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('ofertas') // ← Aquí apunta directamente a la colección 'Ropa'
+        .collection('ofertas')
         .get();
 
     final datos = snapshot.docs.map((doc) {
@@ -42,7 +42,6 @@ class homeState extends State<home> {
       products = datos;
     });
   }
-
 
   void navigateTo(String routeName) {
     Navigator.pushNamed(context, routeName);
@@ -169,64 +168,42 @@ class homeState extends State<home> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          // ✅ Encabezado visual corregido
+          SizedBox(
+            height: 150,
+            width: double.infinity,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: GestureDetector(
                     onTap: () => navigateTo('/alimentacion'),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          'lib/assets/logo_alimentacion.png',
-                          height: 80,
-                          fit: BoxFit.contain,
-                        ),
-                        SizedBox(height: 8),
-                      ],
+                    child: Image.asset(
+                      'lib/assets/logo_alimentacion.png',
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
                 Expanded(
                   child: GestureDetector(
                     onTap: () => navigateTo('/ropaDeportiva'),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          'lib/assets/logo_ropa.png',
-                          height: 80,
-                          fit: BoxFit.contain,
-                        ),
-                        SizedBox(height: 8),
-                        //Text("Ropa", style: TextStyle(fontWeight: FontWeight.bold)),
-                      ],
+                    child: Image.asset(
+                      'lib/assets/logo_ropa.png',
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
                 Expanded(
                   child: GestureDetector(
                     onTap: () => navigateTo('/material'),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          'lib/assets/logo_material.png',
-                          height: 80,
-                          fit: BoxFit.contain,
-                        ),
-                        SizedBox(height: 8),
-                        //Text("Material", style: TextStyle(fontWeight: FontWeight.bold)),
-                      ],
+                    child: Image.asset(
+                      'lib/assets/logo_material.png',
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-
           Expanded(
             child: products.isEmpty
                 ? Center(child: Text('No se encontraron productos.'))
