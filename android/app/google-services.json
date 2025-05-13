@@ -12,7 +12,20 @@
           "package_name": "com.example.activeblendd"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "21870908572-4asbj5a91s0ndu2cn3aok9gbnecc05vd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.activeblendd",
+            "certificate_hash": "65ad03e5e8245cbae02dd9462349013e08a0410b"
+          }
+        },
+        {
+          "client_id": "21870908572-f3s9tt3amplf81ve4lmebao6lpqfl67m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBn_jNy9RNIEkq64XxzfciAaTd3uT3hl-8"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "21870908572-f3s9tt3amplf81ve4lmebao6lpqfl67m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
