@@ -180,12 +180,11 @@ class homeState extends State<home> {
                     child: Column(
                       children: [
                         Image.asset(
-                          'lib/assets/logo.png',
+                          'lib/assets/logo_alimentacion.png',
                           height: 80,
                           fit: BoxFit.contain,
                         ),
                         SizedBox(height: 8),
-                        Text("Alimentación", style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -197,12 +196,12 @@ class homeState extends State<home> {
                     child: Column(
                       children: [
                         Image.asset(
-                          'lib/assets/logo.png',
+                          'lib/assets/logo_ropa.png',
                           height: 80,
                           fit: BoxFit.contain,
                         ),
                         SizedBox(height: 8),
-                        Text("Ropa", style: TextStyle(fontWeight: FontWeight.bold)),
+                        //Text("Ropa", style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -214,12 +213,12 @@ class homeState extends State<home> {
                     child: Column(
                       children: [
                         Image.asset(
-                          'lib/assets/logo.png',
+                          'lib/assets/logo_material.png',
                           height: 80,
                           fit: BoxFit.contain,
                         ),
                         SizedBox(height: 8),
-                        Text("Material", style: TextStyle(fontWeight: FontWeight.bold)),
+                        //Text("Material", style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
