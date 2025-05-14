@@ -5,12 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:activeblendd/screen/alimentacionscreen.dart';
 import 'package:activeblendd/screen/materialscreen.dart';
 import 'package:activeblendd/screen/ropa_deportiva_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
 import 'carrito_screen.dart';
 import 'favoritos_screen.dart';
-
 
 class home extends StatefulWidget {
   @override
@@ -25,9 +23,10 @@ class homeState extends State<home> {
     super.initState();
     cargarProductos();
   }
+
   Future<void> cargarProductos() async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('ofertas') // ← Aquí apunta directamente a la colección 'Ropa'
+        .collection('ofertas')
         .get();
 
     final datos = snapshot.docs.map((doc) {
@@ -44,7 +43,6 @@ class homeState extends State<home> {
       products = datos;
     });
   }
-
 
   void navigateTo(String routeName) {
     Navigator.pushNamed(context, routeName);
@@ -181,62 +179,56 @@ class homeState extends State<home> {
       ),
       body: Column(
         children: [
+          // CABECERA MODIFICADA CON ESPACIOS Y BORDES REDONDEADOS
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => navigateTo('/alimentacion'),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          'lib/assets/logo.png',
-                          height: 80,
-                          fit: BoxFit.contain,
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            child: SizedBox(
+              height: 150,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => navigateTo('/alimentacion'),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'lib/assets/logo_alimentacion.png',
+                          fit: BoxFit.cover,
+                          height: double.infinity,
                         ),
-                        SizedBox(height: 8),
-                        Text("Alimentación", style: TextStyle(fontWeight: FontWeight.bold)),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => navigateTo('/ropaDeportiva'),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          'lib/assets/logo.png',
-                          height: 80,
-                          fit: BoxFit.contain,
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => navigateTo('/ropaDeportiva'),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'lib/assets/logo_ropa.png',
+                          fit: BoxFit.cover,
+                          height: double.infinity,
                         ),
-                        SizedBox(height: 8),
-                        Text("Ropa", style: TextStyle(fontWeight: FontWeight.bold)),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => navigateTo('/material'),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          'lib/assets/logo.png',
-                          height: 80,
-                          fit: BoxFit.contain,
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => navigateTo('/material'),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'lib/assets/logo_material.png',
+                          fit: BoxFit.cover,
+                          height: double.infinity,
                         ),
-                        SizedBox(height: 8),
-                        Text("Material", style: TextStyle(fontWeight: FontWeight.bold)),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -248,22 +240,28 @@ class homeState extends State<home> {
               itemCount: products.length,
               itemBuilder: (context, index) {
                 final product = products[index];
-                final isFav = provider.favorites.any((item) => item['title'] == product['title']);
+                final isFav = provider.favorites.any(
+                        (item) => item['title'] == product['title']);
                 return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: ListTile(
                     leading: Image.network(
                       product['imageUrl'],
                       height: 80,
                       width: 80,
-                      errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
+                      errorBuilder: (context, error, stackTrace) =>
+                          Icon(Icons.broken_image),
                     ),
-                    title: Text(product['title'], style: TextStyle(fontWeight: FontWeight.bold)),
+                    title: Text(product['title'],
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(product['description']),
-                        Text('${product['price']}€', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('${product['price']}€',
+                            style:
+                            TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     trailing: Row(
@@ -271,10 +269,13 @@ class homeState extends State<home> {
                       children: [
                         IconButton(
                           icon: Icon(
-                            isFav ? Icons.favorite : Icons.favorite_border,
+                            isFav
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             color: Colors.red,
                           ),
-                          onPressed: () => provider.toggleFavorite(product),
+                          onPressed: () =>
+                              provider.toggleFavorite(product),
                         ),
                         IconButton(
                           icon: Icon(Icons.add_shopping_cart),
