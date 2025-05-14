@@ -118,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 20),
               Text(
-                isLogin ? 'Bienvenido a ActiveBlend' : 'Crea tu cuenta',
+                isLogin ? 'Bienvenido a ActiveBlen' : 'Crea tu cuenta',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
