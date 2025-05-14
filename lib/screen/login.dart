@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,33 +14,96 @@ class _LoginScreenState extends State<LoginScreen> {
   String error = '';
 
   Future<void> handleAuth() async {
-    try {
-      final email = emailController.text.trim();
-      final password = passwordController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => error = 'Rellena todos los campos.');
+      return;
+    }
+
+    try {
       if (isLogin) {
+        // Intentar iniciar sesión directamente
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
+        Navigator.pushReplacementNamed(context, '/home');
       } else {
+        // Intentar registrar nuevo usuario
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (isLogin) {
+        if (e.code == 'user-not-found') {
+          setState(() => error = 'No existe ninguna cuenta con este correo.');
+        } else if (e.code == 'wrong-password') {
+          setState(() => error = 'La contraseña es incorrecta.');
+        } else if (e.code == 'too-many-requests') {
+          setState(() => error = 'Demasiados intentos fallidos. Inténtalo más tarde.');
+        } else {
+          setState(() => error = 'Error al iniciar sesión: ${e.message}');
+        }
+      } else {
+        if (e.code == 'email-already-in-use') {
+          setState(() => error = 'Ya existe una cuenta con este correo.');
+        } else if (e.code == 'invalid-email') {
+          setState(() => error = 'El correo electrónico no es válido.');
+        } else if (e.code == 'weak-password') {
+          setState(() => error = 'La contraseña es demasiado débil.');
+        } else {
+          setState(() => error = 'Error al registrar: ${e.message}');
+        }
+      }
+    } catch (e) {
+      setState(() => error = 'Error inesperado: $e');
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      final googleSignIn = GoogleSignIn();
+
+      if (await googleSignIn.isSignedIn()) {
+        try {
+          await googleSignIn.signOut();
+        } catch (e) {
+          print('[GoogleSignIn] Error al cerrar sesión previa: $e');
+        }
       }
 
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return;
+
+      final googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      print('[GoogleSignIn] Sesión iniciada como: ${userCredential.user?.email}');
       Navigator.pushReplacementNamed(context, '/home');
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        error = '[FirebaseAuth] ${e.code}: ${e.message}';
+      });
     } catch (e) {
       setState(() {
-        error = e.toString();
+        error = '[Error] $e';
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    print("Ejecutando LoginScreen actualizado");
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -47,9 +111,11 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/logo.png', height: 120, errorBuilder: (context, error, stackTrace) {
-                return Text('Error al cargar logo.png');
-              }),
+              Image.asset(
+                'lib/assets/logo.png',
+                height: 120,
+                errorBuilder: (context, error, stackTrace) => Text('Error al cargar logo.png'),
+              ),
               SizedBox(height: 20),
               Text(
                 isLogin ? 'Bienvenido a ActiveBlend' : 'Crea tu cuenta',
@@ -111,10 +177,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               SizedBox(height: 32),
               GestureDetector(
-                onTap: () {}, // Aquí iría Google Sign-In más adelante
-                child: Image.asset('assets/google_logo.png', height: 50, errorBuilder: (context, error, stackTrace) {
-                  return Text('Error al cargar google_logo.png');
-                }),
+                onTap: signInWithGoogle,
+                child: Image.asset(
+                  'lib/assets/google_logo.png',
+                  height: 50,
+                  errorBuilder: (context, error, stackTrace) => Text('Error al cargar google_logo.png'),
+                ),
               ),
             ],
           ),

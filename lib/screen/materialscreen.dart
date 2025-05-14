@@ -182,8 +182,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
           SizedBox(
             height: 200,
             width: double.infinity,
-            child: Image.asset(
-              'lib/assets/banner_material.png',
+            child: Image.asset('lib/assets/banner_material.png',
               fit: BoxFit.cover,
             ),
           ),
