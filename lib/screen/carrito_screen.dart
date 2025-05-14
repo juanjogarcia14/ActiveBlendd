@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'PantallaPagoScreen.dart';
 import 'product_provider.dart';
+
 
 class CarritoScreen extends StatefulWidget {
   @override
@@ -146,23 +148,9 @@ class _CarritoScreenState extends State<CarritoScreen> {
                   SizedBox(height: 10),
                   ElevatedButton.icon(
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text('¡Gracias por tu compra!'),
-                          content: Text(
-                              'Tu pedido ha sido procesado correctamente.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                cart.clear();
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                              child: Text('Cerrar'),
-                            ),
-                          ],
-                        ),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PantallaPagoScreen()),
                       );
                     },
                     icon: Icon(Icons.shopping_bag, color: Colors.white),
