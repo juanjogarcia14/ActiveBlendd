@@ -51,6 +51,7 @@ class homeState extends State<home> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProductProvider>(context);
+    final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -116,12 +117,27 @@ class homeState extends State<home> {
               decoration: BoxDecoration(
                 color: Color(0xFFA8E6DB),
               ),
-              child: Text(
-                'Menú',
-                style: TextStyle(
-                  color: Color(0xFF00796B),
-                  fontSize: 24,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Hola',
+                    style: TextStyle(
+                      color: Color(0xFF00796B),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    user?.email ?? 'Sin sesión activa',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
             ),
             ListTile(
@@ -179,7 +195,6 @@ class homeState extends State<home> {
       ),
       body: Column(
         children: [
-          // CABECERA MODIFICADA CON ESPACIOS Y BORDES REDONDEADOS
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             child: SizedBox(
@@ -231,7 +246,6 @@ class homeState extends State<home> {
               ),
             ),
           ),
-
           Expanded(
             child: products.isEmpty
                 ? Center(child: Text('No se encontraron productos.'))
@@ -279,7 +293,8 @@ class homeState extends State<home> {
                         ),
                         IconButton(
                           icon: Icon(Icons.add_shopping_cart),
-                          onPressed: () => provider.addToCart(product),
+                          onPressed: () =>
+                              provider.addToCart(product),
                         ),
                       ],
                     ),
