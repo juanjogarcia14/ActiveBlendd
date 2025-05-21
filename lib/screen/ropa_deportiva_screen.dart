@@ -6,6 +6,7 @@ import 'favoritos_screen.dart';
 import 'product_provider.dart';
 import 'carrito_screen.dart';
 import 'home.dart';
+import 'package:activeblendd/widgets/producto_search_delegate.dart';
 
 class RopaDeportivaScreen extends StatefulWidget {
   @override
@@ -22,9 +23,7 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
   }
 
   Future<void> cargarProductos() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('Ropa')
-        .get();
+    final snapshot = await FirebaseFirestore.instance.collection('Ropa').get();
 
     final datos = snapshot.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
@@ -39,6 +38,27 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
     setState(() {
       products = datos;
     });
+  }
+
+  Future<List<Map<String, dynamic>>> cargarTodosLosProductos() async {
+    final colecciones = ['Alimentacion', 'Material', 'Ropa', 'ofertas', 'productos'];
+    List<Map<String, dynamic>> todos = [];
+
+    for (String col in colecciones) {
+      final snapshot = await FirebaseFirestore.instance.collection(col).get();
+      final productos = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return {
+          'title': data['nombre'] ?? '',
+          'description': data['descripcion'] ?? '',
+          'price': data['precio'] ?? 0,
+          'imageUrl': data['imagen'] ?? '',
+        };
+      }).toList();
+      todos.addAll(productos);
+    }
+
+    return todos;
   }
 
   void navigateTo(String routeName) {
@@ -73,7 +93,19 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.search, color: Colors.black),
-            onPressed: () {},
+            onPressed: () async {
+              final productos = await cargarTodosLosProductos();
+              if (productos.isNotEmpty) {
+                showSearch(
+                  context: context,
+                  delegate: ProductoSearchDelegate(productos),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('No se encontraron productos')),
+                );
+              }
+            },
           ),
           IconButton(
             icon: Stack(
@@ -110,9 +142,7 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color(0xFFA8E6DB),
-              ),
+              decoration: BoxDecoration(color: Color(0xFFA8E6DB)),
               child: Text(
                 'Menú',
                 style: TextStyle(
@@ -231,7 +261,8 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
                         ),
                         IconButton(
                           icon: Icon(Icons.add_shopping_cart),
-                          onPressed: () => provider.addToCart(product),
+                          onPressed: () =>
+                              provider.addToCart(product),
                         ),
                       ],
                     ),
@@ -261,8 +292,6 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
         onTap: (index) {
           if (index == 0) {
             Navigator.pushNamed(context, '/home');
-          } else if (index == 1) {
-            // Ya estás en esta pantalla
           } else if (index == 2) {
             Navigator.push(
               context,

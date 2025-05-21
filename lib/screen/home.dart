@@ -1,3 +1,4 @@
+// Importaciones
 import 'package:activeblendd/screen/product_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:activeblendd/screen/alimentacionscreen.dart';
 import 'package:activeblendd/screen/materialscreen.dart';
 import 'package:activeblendd/screen/ropa_deportiva_screen.dart';
+import 'package:activeblendd/widgets/producto_search_delegate.dart';
 import 'package:provider/provider.dart';
 
 import 'carrito_screen.dart';
@@ -25,9 +27,7 @@ class homeState extends State<home> {
   }
 
   Future<void> cargarProductos() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('ofertas')
-        .get();
+    final snapshot = await FirebaseFirestore.instance.collection('ofertas').get();
 
     final datos = snapshot.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
@@ -42,6 +42,28 @@ class homeState extends State<home> {
     setState(() {
       products = datos;
     });
+  }
+
+  // Para el buscador: todas las colecciones
+  Future<List<Map<String, dynamic>>> cargarTodosLosProductos() async {
+    final colecciones = ['Alimentacion', 'Material', 'Ropa', 'ofertas', 'productos'];
+    List<Map<String, dynamic>> todos = [];
+
+    for (String col in colecciones) {
+      final snapshot = await FirebaseFirestore.instance.collection(col).get();
+      final productos = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return {
+          'title': data['nombre'] ?? '',
+          'description': data['descripcion'] ?? '',
+          'price': data['precio'] ?? 0,
+          'imageUrl': data['imagen'] ?? '',
+        };
+      }).toList();
+      todos.addAll(productos);
+    }
+
+    return todos;
   }
 
   void navigateTo(String routeName) {
@@ -77,7 +99,19 @@ class homeState extends State<home> {
         actions: [
           IconButton(
             icon: Icon(Icons.search, color: Colors.black),
-            onPressed: () {},
+            onPressed: () async {
+              final productos = await cargarTodosLosProductos();
+              if (productos.isNotEmpty) {
+                showSearch(
+                  context: context,
+                  delegate: ProductoSearchDelegate(productos),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('No se encontraron productos')),
+                );
+              }
+            },
           ),
           IconButton(
             icon: Stack(
@@ -114,29 +148,19 @@ class homeState extends State<home> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color(0xFFA8E6DB),
-              ),
+              decoration: BoxDecoration(color: Color(0xFFA8E6DB)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Hola',
-                    style: TextStyle(
-                      color: Color(0xFF00796B),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text('Hola',
+                      style: TextStyle(
+                          color: Color(0xFF00796B),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold)),
                   SizedBox(height: 12),
-                  Text(
-                    user?.email ?? 'Sin sesión activa',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 16,
-                    ),
-                  ),
+                  Text(user?.email ?? 'Sin sesión activa',
+                      style: TextStyle(color: Colors.black87, fontSize: 16)),
                 ],
               ),
             ),
@@ -254,8 +278,8 @@ class homeState extends State<home> {
               itemCount: products.length,
               itemBuilder: (context, index) {
                 final product = products[index];
-                final isFav = provider.favorites.any(
-                        (item) => item['title'] == product['title']);
+                final isFav = provider.favorites
+                    .any((item) => item['title'] == product['title']);
                 return Card(
                   margin:
                   EdgeInsets.symmetric(horizontal: 16, vertical: 8),
