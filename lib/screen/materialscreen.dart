@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'carrito_screen.dart';
 import 'favoritos_screen.dart';
 import 'product_provider.dart';
+import 'package:activeblendd/widgets/producto_search_delegate.dart';
 
 class MaterialScreen extends StatefulWidget {
   @override
@@ -40,7 +40,27 @@ class _MaterialScreenState extends State<MaterialScreen> {
       products = datos;
     });
   }
+  
+  Future<List<Map<String, dynamic>>> cargarTodosLosProductos() async {
+    final colecciones = ['Alimentacion', 'Material', 'Ropa', 'ofertas', 'productos'];
+    List<Map<String, dynamic>> todos = [];
 
+    for (String col in colecciones) {
+      final snapshot = await FirebaseFirestore.instance.collection(col).get();
+      final productos = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return {
+          'title': data['nombre'] ?? '',
+          'description': data['descripcion'] ?? '',
+          'price': data['precio'] ?? 0,
+          'imageUrl': data['imagen'] ?? '',
+        };
+      }).toList();
+      todos.addAll(productos);
+    }
+
+    return todos;
+  }
 
   void navigateTo(String routeName) {
     Navigator.pushNamed(context, routeName);
@@ -76,7 +96,19 @@ class _MaterialScreenState extends State<MaterialScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.search, color: Colors.black),
-            onPressed: () {},
+            onPressed: () async {
+              final productos = await cargarTodosLosProductos();
+              if (productos.isNotEmpty) {
+                showSearch(
+                  context: context,
+                  delegate: ProductoSearchDelegate(productos),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('No se encontraron productos')),
+                );
+              }
+            },
           ),
           IconButton(
             icon: Stack(
@@ -260,8 +292,6 @@ class _MaterialScreenState extends State<MaterialScreen> {
         onTap: (index) {
           if (index == 0) {
             Navigator.pushNamed(context, '/home');
-          } else if (index == 1) {
-            // Ya estás en esta pantalla
           } else if (index == 2) {
             Navigator.push(
               context,
