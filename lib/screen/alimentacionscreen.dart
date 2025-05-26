@@ -214,7 +214,7 @@ class _AlimentacionScreenState extends State<AlimentacionScreen> {
             height: 200,
             width: double.infinity,
             child: Image.asset(
-              'lib/assets/banner_alimentacion.png',
+              'lib/assets/logo_alimentacion.png',
               fit: BoxFit.cover,
             ),
           ),
