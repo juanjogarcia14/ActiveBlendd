@@ -54,6 +54,7 @@ class homeState extends State<home> {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -246,6 +247,26 @@ class homeState extends State<home> {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(10, (index) =>
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Transform.rotate(
+                        angle: -0.2,
+                        child: Image.asset(
+                          'lib/assets/oferta.png',
+                          width: 50,
+                        ),
+                      ),
+                    ),
+                ),
+              ),
+            ),
+          ),
           Expanded(
             child: products.isEmpty
                 ? Center(child: Text('No se encontraron productos.'))
@@ -306,14 +327,17 @@ class homeState extends State<home> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Inicio',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Categorías',
+            icon: SizedBox(
+              height: 24,
+              child: Image.asset('lib/assets/logo_ab.png'),
+            ),
+            label: 'Aciveblend',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),

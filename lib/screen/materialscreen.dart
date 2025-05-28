@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'carrito_screen.dart';
 import 'favoritos_screen.dart';
@@ -41,7 +40,6 @@ class _MaterialScreenState extends State<MaterialScreen> {
     });
   }
 
-
   void navigateTo(String routeName) {
     Navigator.pushNamed(context, routeName);
   }
@@ -51,8 +49,10 @@ class _MaterialScreenState extends State<MaterialScreen> {
     final provider = Provider.of<ProductProvider>(context);
     final cart = provider.cart;
     final favorites = provider.favorites;
+    final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
+      backgroundColor: Colors.white, // Fondo blanco
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -116,12 +116,27 @@ class _MaterialScreenState extends State<MaterialScreen> {
               decoration: BoxDecoration(
                 color: Color(0xFFA8E6DB),
               ),
-              child: Text(
-                'Menú',
-                style: TextStyle(
-                  color: Color(0xFF00796B),
-                  fontSize: 24,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Hola',
+                    style: TextStyle(
+                      color: Color(0xFF00796B),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    user?.email ?? 'Sin sesión activa',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
             ),
             ListTile(
@@ -182,7 +197,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
           SizedBox(
             height: 200,
             width: double.infinity,
-            child: Image.asset('lib/assets/banner_material.png',
+            child: Image.asset(
+              'lib/assets/logo_material.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -197,6 +213,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
                 final isFav = favorites.any((item) => item['title'] == product['title']);
                 return Card(
                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  color: Color(0xFFF0F0F0), // Tarjeta en gris claro
                   child: ListTile(
                     leading: Image.network(
                       product['imageUrl'],
@@ -242,15 +259,17 @@ class _MaterialScreenState extends State<MaterialScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Inicio',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Categorías',
+            icon: SizedBox(
+              height: 24,
+              child: Image.asset('lib/assets/logo_ab.png'),
+            ),
+            label: 'Aciveblend',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
@@ -258,11 +277,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
           ),
         ],
         onTap: (index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, '/home');
-          } else if (index == 1) {
-            // Ya estás en esta pantalla
-          } else if (index == 2) {
+          if (index == 2) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => FavoritosScreen()),
