@@ -40,7 +40,7 @@ class _MaterialScreenState extends State<MaterialScreen> {
       products = datos;
     });
   }
-  
+
   Future<List<Map<String, dynamic>>> cargarTodosLosProductos() async {
     final colecciones = ['Alimentacion', 'Material', 'Ropa', 'ofertas', 'productos'];
     List<Map<String, dynamic>> todos = [];
@@ -71,8 +71,10 @@ class _MaterialScreenState extends State<MaterialScreen> {
     final provider = Provider.of<ProductProvider>(context);
     final cart = provider.cart;
     final favorites = provider.favorites;
+    final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -148,12 +150,27 @@ class _MaterialScreenState extends State<MaterialScreen> {
               decoration: BoxDecoration(
                 color: Color(0xFFA8E6DB),
               ),
-              child: Text(
-                'Menú',
-                style: TextStyle(
-                  color: Color(0xFF00796B),
-                  fontSize: 24,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Hola',
+                    style: TextStyle(
+                      color: Color(0xFF00796B),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    user?.email ?? 'Sin sesión activa',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
             ),
             ListTile(
@@ -214,7 +231,8 @@ class _MaterialScreenState extends State<MaterialScreen> {
           SizedBox(
             height: 200,
             width: double.infinity,
-            child: Image.asset('lib/assets/logo_material.png',
+            child: Image.asset(
+              'lib/assets/logo_material.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -229,12 +247,14 @@ class _MaterialScreenState extends State<MaterialScreen> {
                 final isFav = favorites.any((item) => item['title'] == product['title']);
                 return Card(
                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  color: Color(0xFFF0F0F0),
                   child: ListTile(
                     leading: Image.network(
                       product['imageUrl'],
                       height: 80,
                       width: 80,
-                      errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
+                      errorBuilder: (context, error, stackTrace) =>
+                          Icon(Icons.broken_image),
                     ),
                     title: Text(
                       product['title'],
@@ -274,15 +294,17 @@ class _MaterialScreenState extends State<MaterialScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Inicio',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Categorías',
+            icon: SizedBox(
+              height: 24,
+              child: Image.asset('lib/assets/logo_ab.png'),
+            ),
+            label: 'Aciveblend',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),

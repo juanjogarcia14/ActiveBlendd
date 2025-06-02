@@ -10,9 +10,6 @@ import 'screen/materialscreen.dart';
 import 'screen/sobre_nosotros_screen.dart';
 import 'screen/carrito_screen.dart';
 
-
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
