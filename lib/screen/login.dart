@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Image.asset(
                 'lib/assets/logo.png',
-                height: 120,
+                height: 180,
                 errorBuilder: (context, error, stackTrace) => Text('Error al cargar logo.png'),
               ),
               SizedBox(height: 20),
