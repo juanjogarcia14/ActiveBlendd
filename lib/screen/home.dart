@@ -44,7 +44,6 @@ class homeState extends State<home> {
     });
   }
 
-  // Para el buscador: todas las colecciones
   Future<List<Map<String, dynamic>>> cargarTodosLosProductos() async {
     final colecciones = ['Alimentacion', 'Material', 'Ropa', 'ofertas', 'productos'];
     List<Map<String, dynamic>> todos = [];
@@ -89,7 +88,7 @@ class homeState extends State<home> {
           ),
         ),
         title: Text(
-          'ACTIVEBLEN',
+          'ACTIVEBLEND',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
@@ -302,45 +301,62 @@ class homeState extends State<home> {
                 final isFav = provider.favorites
                     .any((item) => item['title'] == product['title']);
                 return Card(
-                  margin:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ListTile(
-                    leading: Image.network(
-                      product['imageUrl'],
-                      height: 80,
-                      width: 80,
-                      errorBuilder: (context, error, stackTrace) =>
-                          Icon(Icons.broken_image),
-                    ),
-                    title: Text(product['title'],
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  color: Color(0xFFF7F4FF),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(product['description']),
-                        Text('${product['price']}€',
-                            style:
-                            TextStyle(fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            isFav
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: Colors.red,
+                        Container(
+                          width: 130,
+                          height: 130,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              product['imageUrl'],
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(Icons.broken_image),
+                            ),
                           ),
-                          onPressed: () =>
-                              provider.toggleFavorite(product),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.add_shopping_cart),
-                          onPressed: () =>
-                              provider.addToCart(product),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(product['title'],
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 16)),
+                              SizedBox(height: 4),
+                              Text(product['description']),
+                              SizedBox(height: 4),
+                              Text('${product['price']}€',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 14)),
+                            ],
+                          ),
                         ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                isFav ? Icons.favorite : Icons.favorite_border,
+                                color: Colors.red,
+                              ),
+                              onPressed: () => provider.toggleFavorite(product),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.add_shopping_cart),
+                              onPressed: () => provider.addToCart(product),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),
