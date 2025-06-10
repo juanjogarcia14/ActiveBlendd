@@ -62,17 +62,19 @@ class _CarritoScreenState extends State<CarritoScreen> {
                   elevation: 4,
                   margin: EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  color: Colors.white,
                   child: Padding(
                     padding: EdgeInsets.all(12),
                     child: Row(
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            item['image'],
+                          child: Image.network(
+                            item['imageUrl'] ?? '',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
                           ),
                         ),
                         SizedBox(width: 12),
@@ -124,7 +126,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                         icon: Icon(Icons.delete_outline),
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: Colors.grey.shade700,
+                          backgroundColor: Colors.red,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           padding: EdgeInsets.symmetric(vertical: 14),
                         ),

@@ -9,33 +9,74 @@ class FavoritosScreen extends StatelessWidget {
     final favorites = provider.favorites;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Favoritos'),
+        title: Text('Favoritos', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        elevation: 1,
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       body: favorites.isEmpty
-          ? Center(child: Text('No tienes productos favoritos.'))
+          ? Center(
+        child: Text(
+          'No tienes productos favoritos.',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      )
           : ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         itemCount: favorites.length,
         itemBuilder: (context, index) {
           final product = favorites[index];
           return Card(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              leading: Image.network(
-                product['imageUrl'],
-                width: 80,
-                height: 80,
-                errorBuilder: (context, error, stackTrace) =>
-                    Icon(Icons.broken_image),
-              ),
-              title: Text(product['title'] ?? '',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text('${product['price']}€'),
-              trailing: IconButton(
-                icon: Icon(Icons.add_shopping_cart),
-                onPressed: () => provider.addToCart(product),
+            elevation: 4,
+            margin: EdgeInsets.only(bottom: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            color: Colors.white,
+            child: Padding(
+              padding: EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      product['imageUrl'],
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Icon(Icons.broken_image, size: 80),
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product['title'] ?? '',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '${product['price']}€',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.add_shopping_cart),
+                    onPressed: () => provider.addToCart(product),
+                    color: Colors.black87,
+                  ),
+                ],
               ),
             ),
           );
@@ -57,3 +98,4 @@ class FavoritosScreen extends StatelessWidget {
     );
   }
 }
+

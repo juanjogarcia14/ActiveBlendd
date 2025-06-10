@@ -171,6 +171,7 @@ class RopaDeportivaScreenState extends State<RopaDeportivaScreen> {
                   elevation: 4,
                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  color: Colors.white,
                   child: Padding(
                     padding: EdgeInsets.all(12),
                     child: Row(
