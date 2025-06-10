@@ -1,4 +1,5 @@
 // Importaciones
+import 'dart:async';
 import 'package:activeblendd/screen/product_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,16 +20,56 @@ class home extends StatefulWidget {
 
 class homeState extends State<home> {
   List<Map<String, dynamic>> products = [];
+  final PageController _pageController = PageController(viewportFraction: 1.0);
+  int _currentPage = 0;
+  Timer? _sliderTimer;
+  bool _autoSliding = true;
+
+  final List<Map<String, String>> banners = [
+    {'image': 'lib/assets/logo_alimentacion.png', 'route': '/alimentacion'},
+    {'image': 'lib/assets/logo_ropa.png', 'route': '/ropaDeportiva'},
+    {'image': 'lib/assets/logo_material.png', 'route': '/material'},
+  ];
 
   @override
   void initState() {
     super.initState();
     cargarProductos();
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _sliderTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (_autoSliding && _pageController.hasClients) {
+        int nextPage = (_currentPage + 1) % banners.length;
+        _pageController.animateToPage(
+          nextPage,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        setState(() {
+          _currentPage = nextPage;
+        });
+      }
+    });
+  }
+
+  void _stopAutoSlide() {
+    setState(() {
+      _autoSliding = false;
+    });
+    _sliderTimer?.cancel();
+  }
+
+  @override
+  void dispose() {
+    _sliderTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
   }
 
   Future<void> cargarProductos() async {
     final snapshot = await FirebaseFirestore.instance.collection('ofertas').get();
-
     final datos = snapshot.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
       return {
@@ -38,7 +79,6 @@ class homeState extends State<home> {
         'imageUrl': data['imagen'],
       };
     }).toList();
-
     setState(() {
       products = datos;
     });
@@ -47,7 +87,6 @@ class homeState extends State<home> {
   Future<List<Map<String, dynamic>>> cargarTodosLosProductos() async {
     final colecciones = ['Alimentacion', 'Material', 'Ropa', 'ofertas', 'productos'];
     List<Map<String, dynamic>> todos = [];
-
     for (String col in colecciones) {
       final snapshot = await FirebaseFirestore.instance.collection(col).get();
       final productos = snapshot.docs.map((doc) {
@@ -61,12 +100,40 @@ class homeState extends State<home> {
       }).toList();
       todos.addAll(productos);
     }
-
     return todos;
   }
 
   void navigateTo(String routeName) {
+    _stopAutoSlide();
     Navigator.pushNamed(context, routeName);
+  }
+
+  void _nextPage() {
+    _stopAutoSlide();
+    if (_currentPage < banners.length - 1) {
+      _currentPage++;
+    } else {
+      _currentPage = 0;
+    }
+    _pageController.animateToPage(
+      _currentPage,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _previousPage() {
+    _stopAutoSlide();
+    if (_currentPage > 0) {
+      _currentPage--;
+    } else {
+      _currentPage = banners.length - 1;
+    }
+    _pageController.animateToPage(
+      _currentPage,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -82,19 +149,10 @@ class homeState extends State<home> {
         leading: Builder(
           builder: (context) => IconButton(
             icon: Icon(Icons.menu, color: Colors.black),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: Text(
-          'ACTIVEBLEND',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-            fontSize: 18,
-          ),
-        ),
+        title: Text('ACTIVEBLEND', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -102,14 +160,9 @@ class homeState extends State<home> {
             onPressed: () async {
               final productos = await cargarTodosLosProductos();
               if (productos.isNotEmpty) {
-                showSearch(
-                  context: context,
-                  delegate: ProductoSearchDelegate(productos),
-                );
+                showSearch(context: context, delegate: ProductoSearchDelegate(productos));
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('No se encontraron productos')),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se encontraron productos')));
               }
             },
           ),
@@ -123,24 +176,13 @@ class homeState extends State<home> {
                     child: CircleAvatar(
                       radius: 8,
                       backgroundColor: Colors.red,
-                      child: Text(
-                        '${provider.cart.length}',
-                        style: TextStyle(color: Colors.white, fontSize: 10),
-                      ),
+                      child: Text('${provider.cart.length}', style: TextStyle(color: Colors.white, fontSize: 10)),
                     ),
-                  )
+                  ),
               ],
             ),
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CarritoScreen(),
-                ),
-              );
-              setState(() {});
-            },
-          )
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CarritoScreen())).then((_) => setState(() {})),
+          ),
         ],
       ),
       drawer: Drawer(
@@ -153,57 +195,17 @@ class homeState extends State<home> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Hola',
-                      style: TextStyle(
-                          color: Color(0xFF00796B),
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold)),
+                  Text('Hola', style: TextStyle(color: Color(0xFF00796B), fontSize: 24, fontWeight: FontWeight.bold)),
                   SizedBox(height: 12),
-                  Text(user?.email ?? 'Sin sesión activa',
-                      style: TextStyle(color: Colors.black87, fontSize: 16)),
+                  Text(user?.email ?? 'Sin sesión activa', style: TextStyle(color: Colors.black87, fontSize: 16)),
                 ],
               ),
             ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
-              onTap: () {
-                Navigator.pop(context);
-                navigateTo('/home');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.set_meal),
-              title: Text('Alimentación'),
-              onTap: () {
-                Navigator.pop(context);
-                navigateTo('/alimentacion');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.fitness_center),
-              title: Text('Material'),
-              onTap: () {
-                Navigator.pop(context);
-                navigateTo('/material');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.checkroom),
-              title: Text('Ropa Deportiva'),
-              onTap: () {
-                Navigator.pop(context);
-                navigateTo('/ropaDeportiva');
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.info),
-              title: Text('Sobre Nosotros'),
-              onTap: () {
-                Navigator.pop(context);
-                navigateTo('/sobreNosotros');
-              },
-            ),
+            ListTile(leading: Icon(Icons.home), title: Text('Home'), onTap: () => navigateTo('/home')),
+            ListTile(leading: Icon(Icons.set_meal), title: Text('Alimentación'), onTap: () => navigateTo('/alimentacion')),
+            ListTile(leading: Icon(Icons.fitness_center), title: Text('Material'), onTap: () => navigateTo('/material')),
+            ListTile(leading: Icon(Icons.checkroom), title: Text('Ropa Deportiva'), onTap: () => navigateTo('/ropaDeportiva')),
+            ListTile(leading: Icon(Icons.info), title: Text('Sobre Nosotros'), onTap: () => navigateTo('/sobreNosotros')),
             Divider(),
             ListTile(
               leading: Icon(Icons.logout),
@@ -217,179 +219,184 @@ class homeState extends State<home> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-            child: SizedBox(
-              height: 150,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => navigateTo('/alimentacion'),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'lib/assets/logo_alimentacion.png',
-                          fit: BoxFit.cover,
-                          height: double.infinity,
-                        ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      height: 250,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: banners.length,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentPage = index;
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          final banner = banners[index];
+                          return GestureDetector(
+                            onTap: () => navigateTo(banner['route']!),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.asset(
+                                banner['image']!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => navigateTo('/ropaDeportiva'),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'lib/assets/logo_ropa.png',
-                          fit: BoxFit.cover,
-                          height: double.infinity,
-                        ),
+                    Positioned(
+                      left: 0,
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back_ios, color: Colors.black45),
+                        onPressed: _previousPage,
                       ),
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => navigateTo('/material'),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'lib/assets/logo_material.png',
-                          fit: BoxFit.cover,
-                          height: double.infinity,
-                        ),
+                    Positioned(
+                      right: 0,
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_forward_ios, color: Colors.black45),
+                        onPressed: _nextPage,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(10, (index) =>
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Transform.rotate(
-                        angle: -0.2,
-                        child: Image.asset(
-                          'lib/assets/oferta.png',
-                          width: 50,
-                        ),
-                      ),
-                    ),
+                  ],
                 ),
               ),
-            ),
-          ),
-          Expanded(
-            child: products.isEmpty
-                ? Center(child: Text('No se encontraron productos.'))
-                : ListView.builder(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                final isFav = provider.favorites
-                    .any((item) => item['title'] == product['title']);
-                return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  color: Color(0xFFF7F4FF),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 130,
-                          height: 130,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
+              Text('OFERTAS EXCLUSIVAS', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Divider(),
+              products.isEmpty
+                  ? Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(child: Text('No se encontraron productos.')),
+              )
+                  : ListView.builder(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  final isFav = provider.favorites.any((item) => item['title'] == product['title']);
+                  return Card(
+                    elevation: 4,
+                    margin: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: EdgeInsets.all(12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
                             child: Image.network(
                               product['imageUrl'],
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Icon(Icons.broken_image),
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(product['title'],
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 16)),
-                              SizedBox(height: 4),
-                              Text(product['description']),
-                              SizedBox(height: 4),
-                              Text('${product['price']}€',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 14)),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                isFav ? Icons.favorite : Icons.favorite_border,
-                                color: Colors.red,
-                              ),
-                              onPressed: () => provider.toggleFavorite(product),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(product['title'], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                SizedBox(height: 6),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      product['description'],
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(color: Colors.grey[700]),
+                                    ),
+                                    SizedBox(height: 4),
+                                    GestureDetector(
+                                      onTap: () => showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text(product['title']),
+                                          content: Text(product['description']),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context),
+                                              child: Text('Cerrar'),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      child: Text('Ver más', style: TextStyle(color: Colors.blue, fontSize: 13)),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('${product['price']}€',
+                                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                            isFav ? Icons.favorite : Icons.favorite_border,
+                                            color: isFav ? Colors.red : Colors.grey,
+                                          ),
+                                          onPressed: () => provider.toggleFavorite(product),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.add_shopping_cart, color: Colors.grey[800]),
+                                          onPressed: () => provider.addToCart(product),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                )
+                              ],
                             ),
-                            IconButton(
-                              icon: Icon(Icons.add_shopping_cart),
-                              onPressed: () => provider.addToCart(product),
-                            ),
-                          ],
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Inicio',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(
             icon: SizedBox(
               height: 24,
-              child: Image.asset('lib/assets/logo_ab.png'),
+              child: Image.asset('lib/assets/logo_ab.png', fit: BoxFit.contain),
             ),
-            label: 'Aciveblend',
+            label: 'Activeblend',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favoritos',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favoritos'),
         ],
         onTap: (index) {
           if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => FavoritosScreen()),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => FavoritosScreen()));
           }
         },
       ),
