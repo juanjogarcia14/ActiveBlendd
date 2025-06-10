@@ -15,6 +15,30 @@ class FavoritosScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 1,
         iconTheme: IconThemeData(color: Colors.black),
+        actions: [
+          if (favorites.isNotEmpty)
+            TextButton(
+              onPressed: () {
+                provider.clearFavorites();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Favoritos eliminados')),
+                );
+              },
+              child: Row(
+                children: [
+                  Text(
+                    'Borrar favoritos',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Icon(Icons.delete, color: Colors.redAccent),
+                ],
+              ),
+            ),
+        ],
       ),
       body: favorites.isEmpty
           ? Center(
@@ -31,7 +55,8 @@ class FavoritosScreen extends StatelessWidget {
           return Card(
             elevation: 4,
             margin: EdgeInsets.only(bottom: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16)),
             color: Colors.white,
             child: Padding(
               padding: EdgeInsets.all(12),
@@ -76,26 +101,26 @@ class FavoritosScreen extends StatelessWidget {
                     onPressed: () => provider.addToCart(product),
                     color: Colors.black87,
                   ),
+                  IconButton(
+                    icon: Icon(Icons.delete_outline),
+                    onPressed: () {
+                      provider.removeFromFavorites(product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Producto eliminado de favoritos',
+                          ),
+                        ),
+                      );
+                    },
+                    color: Colors.redAccent,
+                  ),
                 ],
               ),
             ),
           );
         },
       ),
-      floatingActionButton: favorites.isNotEmpty
-          ? FloatingActionButton.extended(
-        onPressed: () {
-          provider.clearFavorites();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Favoritos eliminados')),
-          );
-        },
-        icon: Icon(Icons.delete),
-        label: Text('Borrar todos'),
-        backgroundColor: Colors.redAccent,
-      )
-          : null,
     );
   }
 }
-
