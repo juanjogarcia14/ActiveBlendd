@@ -1,13 +1,17 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as mat;
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'product_provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class CarritoScreen extends StatefulWidget {
+class CarritoScreen extends mat.StatefulWidget {
   @override
   _CarritoScreenState createState() => _CarritoScreenState();
 }
 
-class _CarritoScreenState extends State<CarritoScreen> {
+class _CarritoScreenState extends mat.State<CarritoScreen> {
   void aumentarCantidad(int index, List<Map<String, dynamic>> cart) {
     setState(() {
       cart[index]['quantity'] += 1;
@@ -38,73 +42,119 @@ class _CarritoScreenState extends State<CarritoScreen> {
     return cart.fold(0, (sum, item) => sum + (item['price'] * item['quantity']));
   }
 
+  Future<void> realizarPago(double total, List<Map<String, dynamic>> cart) async {
+    try {
+      print('Enviando POST a createPaymentIntent');
+
+      final url = Uri.parse('http://10.0.2.2:5001/activeblendd-master-2/us-central1/createPaymentIntent');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'amount': (total * 100).toInt()}),
+      );
+
+      final data = jsonDecode(response.body);
+      print('Respuesta recibida: $data');
+
+      final clientSecret = data['clientSecret'];
+
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: clientSecret,
+          merchantDisplayName: 'ActiveBlend',
+        ),
+      );
+
+      await Stripe.instance.presentPaymentSheet();
+
+      mat.ScaffoldMessenger.of(context).showSnackBar(
+        mat.SnackBar(content: mat.Text('✅ Pago completado con éxito')),
+      );
+
+      setState(() {
+        cart.clear();
+      });
+    } catch (e) {
+      print('❌ Error en el pago (HTTP): $e');
+      mat.ScaffoldMessenger.of(context).showSnackBar(
+        mat.SnackBar(content: mat.Text('❌ Error al procesar el pago')),
+      );
+    }
+  }
   @override
-  Widget build(BuildContext context) {
+  mat.Widget build(mat.BuildContext context) {
     final cart = Provider.of<ProductProvider>(context).cart;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Carrito", style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+    return mat.Scaffold(
+      appBar: mat.AppBar(
+        title: mat.Text("Carrito", style: mat.TextStyle(color: mat.Colors.black)),
+        backgroundColor: mat.Colors.white,
         elevation: 1,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: mat.IconThemeData(color: mat.Colors.black),
       ),
-      backgroundColor: Colors.white,
-      body: Column(
+      backgroundColor: mat.Colors.white,
+      body: mat.Column(
         children: [
-          Expanded(
-            child: ListView.builder(
+          mat.Expanded(
+            child: mat.ListView.builder(
               itemCount: cart.length,
-              padding: EdgeInsets.all(12),
+              padding: mat.EdgeInsets.all(12),
               itemBuilder: (context, index) {
                 final item = cart[index];
-                return Card(
+                final double precio = (item['price'] ?? 0).toDouble();
+                final int cantidad = (item['quantity'] ?? 1).toInt();
+
+                return mat.Card(
                   elevation: 4,
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  color: Colors.white,
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Row(
+                  margin: mat.EdgeInsets.symmetric(vertical: 8),
+                  shape: mat.RoundedRectangleBorder(
+                    borderRadius: mat.BorderRadius.circular(16),
+                  ),
+                  color: mat.Colors.white,
+                  child: mat.Padding(
+                    padding: mat.EdgeInsets.all(12),
+                    child: mat.Row(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
+                        mat.ClipRRect(
+                          borderRadius: mat.BorderRadius.circular(12),
+                          child: mat.Image.network(
                             item['imageUrl'] ?? '',
                             width: 60,
                             height: 60,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
+                            fit: mat.BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                mat.Icon(mat.Icons.broken_image),
                           ),
                         ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        mat.SizedBox(width: 12),
+                        mat.Expanded(
+                          child: mat.Column(
+                            crossAxisAlignment: mat.CrossAxisAlignment.start,
                             children: [
-                              Text(item['title'], style: TextStyle(fontWeight: FontWeight.bold)),
-                              Text("Precio: ${item['price'].toStringAsFixed(2)}€"),
-                              Text("Total: ${(item['price'] * item['quantity']).toStringAsFixed(2)}€"),
+                              mat.Text(item['title'] ?? '',
+                                  style: mat.TextStyle(fontWeight: mat.FontWeight.bold)),
+                              mat.Text("Precio: ${precio.toStringAsFixed(2)}€"),
+                              mat.Text("Total: ${(precio * cantidad).toStringAsFixed(2)}€"),
                             ],
                           ),
                         ),
-                        Row(
+                        mat.Row(
                           children: [
-                            IconButton(
-                              icon: Icon(Icons.remove_circle_outline),
+                            mat.IconButton(
+                              icon: mat.Icon(mat.Icons.remove_circle_outline),
                               onPressed: () => disminuirCantidad(index, cart),
                             ),
-                            Text(item['quantity'].toString()),
-                            IconButton(
-                              icon: Icon(Icons.add_circle_outline),
+                            mat.Text(cantidad.toString()),
+                            mat.IconButton(
+                              icon: mat.Icon(mat.Icons.add_circle_outline),
                               onPressed: () => aumentarCantidad(index, cart),
                             ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
+                            mat.IconButton(
+                              icon: mat.Icon(mat.Icons.delete, color: mat.Colors.red),
                               onPressed: () => eliminarProducto(index, cart),
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -112,42 +162,44 @@ class _CarritoScreenState extends State<CarritoScreen> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
-            child: Column(
+          mat.Padding(
+            padding: const mat.EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+            child: mat.Column(
               children: [
-                Text("Total: ${calcularTotal(cart).toStringAsFixed(2)}€",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                SizedBox(height: 10),
-                Row(
+                mat.Text("Total: ${calcularTotal(cart).toStringAsFixed(2)}€",
+                    style: mat.TextStyle(fontSize: 18, fontWeight: mat.FontWeight.bold)),
+                mat.SizedBox(height: 10),
+                mat.Row(
                   children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: Icon(Icons.delete_outline),
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.red,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          padding: EdgeInsets.symmetric(vertical: 14),
+                    mat.Expanded(
+                      child: mat.ElevatedButton.icon(
+                        icon: mat.Icon(mat.Icons.delete_outline),
+                        style: mat.ElevatedButton.styleFrom(
+                          foregroundColor: mat.Colors.white,
+                          backgroundColor: mat.Colors.red,
+                          shape: mat.RoundedRectangleBorder(
+                              borderRadius: mat.BorderRadius.circular(12)),
+                          padding: mat.EdgeInsets.symmetric(vertical: 14),
                         ),
                         onPressed: cart.isEmpty ? null : () => vaciarCarrito(cart),
-                        label: Text("Vaciar carrito"),
+                        label: mat.Text("Vaciar carrito"),
                       ),
                     ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: Icon(Icons.lock_outline),
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Color(0xFF2ebb79), // verde ActiveBlend
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          padding: EdgeInsets.symmetric(vertical: 14),
+                    mat.SizedBox(width: 10),
+                    mat.Expanded(
+                      child: mat.ElevatedButton.icon(
+                        icon: mat.Icon(mat.Icons.lock_outline),
+                        style: mat.ElevatedButton.styleFrom(
+                          foregroundColor: mat.Colors.white,
+                          backgroundColor: mat.Color(0xFF2ebb79),
+                          shape: mat.RoundedRectangleBorder(
+                              borderRadius: mat.BorderRadius.circular(12)),
+                          padding: mat.EdgeInsets.symmetric(vertical: 14),
                         ),
-                        onPressed: cart.isEmpty ? null : () {
-                          // Acción de compra
-                        },
-                        label: Text("Finalizar compra"),
+                        onPressed: cart.isEmpty
+                            ? null
+                            : () => realizarPago(calcularTotal(cart), cart),
+                        label: mat.Text("Finalizar compra"),
                       ),
                     ),
                   ],

@@ -1,1 +1,59 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"activeblendd","appId":"1:43143766085:android:3ea3345f6327406ad8432c","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"activeblendd","appId":"1:43143766085:ios:40c686f0c7fda33ed8432c","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"macos":{"default":{"projectId":"activeblendd","appId":"1:43143766085:ios:40c686f0c7fda33ed8432c","uploadDebugSymbols":false,"fileOutput":"macos/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"activeblendd","configurations":{"android":"1:43143766085:android:3ea3345f6327406ad8432c","ios":"1:43143766085:ios:40c686f0c7fda33ed8432c","macos":"1:43143766085:ios:40c686f0c7fda33ed8432c","web":"1:43143766085:web:e06823cc1c703b85d8432c","windows":"1:43143766085:web:64e1bf1a22009c4fd8432c"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "activeblendd",
+          "appId": "1:43143766085:android:3ea3345f6327406ad8432c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "activeblendd",
+          "appId": "1:43143766085:ios:40c686f0c7fda33ed8432c",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "activeblendd",
+          "appId": "1:43143766085:ios:40c686f0c7fda33ed8432c",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "activeblendd",
+          "configurations": {
+            "android": "1:43143766085:android:3ea3345f6327406ad8432c",
+            "ios": "1:43143766085:ios:40c686f0c7fda33ed8432c",
+            "macos": "1:43143766085:ios:40c686f0c7fda33ed8432c",
+            "web": "1:43143766085:web:e06823cc1c703b85d8432c",
+            "windows": "1:43143766085:web:64e1bf1a22009c4fd8432c"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ],
+  "emulators": {
+    "functions": {
+      "port": 5001
+    }
+  }
+}
