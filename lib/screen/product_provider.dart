@@ -27,4 +27,10 @@ class ProductProvider with ChangeNotifier {
     _favorites.clear();
     notifyListeners();
   }
+
+  void removeFromFavorites(Map<String, dynamic> product) {
+    _favorites.removeWhere((item) => item['title'] == product['title']);
+    notifyListeners();
+  }
+
 }
